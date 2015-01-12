@@ -38,7 +38,7 @@ Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
 
     comments[0].body = "Great story!";
 
-    comments[0].save(); // PUT /api/v1/posts/1/comments/1
+    comments[0].put(); // PUT /api/v1/posts/1/comments/1
   });
 });
 
