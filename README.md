@@ -29,7 +29,7 @@ Restaurang.setUrl("/api/v1");
 Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
   post.name = "Lorem ipsum...";
 
-  post.save(); // PUT /api/v1/articles/1
+  post.save(); // PUT /api/v1/posts/1
 
   // Let's fetch the comments for this post
   post.all("comments").getList().then(function(comments) { // GET /api/v1/posts/1/comments, expects an array
@@ -56,7 +56,7 @@ Restaurang.all("posts").post({ // POST /api/v1/posts
 
 ## Methods
 
-Each Restaurang object have the following object methods (including `Restaurang` itself). Restaurang elements and collections also have some specific methods.
+Each Restaurang object has the following object methods (including `Restaurang` itself). Restaurang elements and collections also have some specific methods.
 
 ### Object methods
 

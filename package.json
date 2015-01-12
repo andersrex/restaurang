@@ -2,7 +2,7 @@
     "name": "restaurang",
     "version": "0.0.1",
     "author": "Anders Rex",
-    "description": "Library for easily consuming RESTful APIs in Javascript.",
+    "description": "A library for easily consuming RESTful APIs in Javascript.",
     "license": "MIT",
     "homepage": "https://github.com/andersrex/restaurang",
     "repository": {
