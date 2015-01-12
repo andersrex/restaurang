@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="Restaurang examples"/>
+    <title>Restaurang examples</title>
+</head>
+<body>
+
+<script src="../dist/restaurang.js"></script>
+<script>
+
+    // Let's start by setting the base url
+    Restaurang.setUrl("http://jsonplaceholder.typicode.com");
+
+    // Fetch one post
+    Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
+        post.name = "Lorem ipsum...";
+
+        post.save(); // PUT /api/v1/posts/1
+
+        // Let's fetch the comments for this post
+        post.all("comments").getList().then(function(comments) { // GET /api/v1/posts/1/comments, expects an array
+
+            console.log(comments[0].id); // 1
+
+            comments[0].body = "Great story!";
+
+            comments[0].save(); // PUT /api/v1/posts/1/comments/1
+        });
+    });
+
+    // Fetch a comment without first fetching the posts
+    Restaurang.one("posts", "1").one("comments", "1").get(); // GET /api/v1/posts/1/comments/1
+
+	// Create a new article
+    Restaurang.all("posts").post({ // POST /api/v1/posts
+        name: "Foo",
+        body: "Bar"
+    }).then(function(post) {
+        console.log(post.body); // Bar
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+    "name": "restaurang",
+    "version": "0.0.1",
+    "author": "Anders Rex",
+    "description": "Library for easily consuming RESTful APIs in Javascript.",
+    "license": "MIT",
+    "homepage": "https://github.com/andersrex/restaurang",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/andersrex/restaurang"
+    },
+    "main": "src/restaurang.js",
+    "devDependencies": {
+        "browserify": "*",
+        "jshint": "*",
+        "jscs": "*",
+        "uglify-js": "*",
+        "live-server": "*"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "scripts": {
+        "lint": "jshint src/",
+        "browserify": "browserify src/restaurang.js --standalone Restaurang > dist/restaurang.js",
+        "uglify": "uglifyjs dist/restaurang.js -o dist/restaurang.min.js",
+        "build": "npm run browserify && npm run uglify"
+    }
+}
