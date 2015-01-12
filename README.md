@@ -14,7 +14,7 @@ This is still very much work in progress. Come back in a few days for something 
 
 `<script src="restaurang.js"></script>`
 
-Include restaurang.js in your project.
+...and you're good to go.
 
 Restaurang.js has no external dependencies but uses ECMAScript 6 promises and some ECMAScript 5 features. This means IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill and <IE9 users will need [es5-shim](https://github.com/es-shims/es5-shim).
 
@@ -42,10 +42,10 @@ Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
   });
 });
 
-// Fetch a comment without first fetching the posts
+// Fetch a comment without first fetching the post
 Restaurang.one("posts", "1").one("comments", "1").get(); // GET /api/v1/posts/1/comments/1
 
-// Create a new article
+// Create a new post
 Restaurang.all("posts").post({ // POST /api/v1/posts
   name: "Foo",
   body: "Bar"
