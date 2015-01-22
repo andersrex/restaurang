@@ -32,27 +32,31 @@ function setUrl(current, url) {
     return current;
 }
 
-// TODO: Add function several(parent, route, ...) { ... }?
+function setDefaultHeaders(current, headers) {
+    current._headers = headers;
+    return current;
+}
 
+// TODO: Add function several(parent, route, ...) { ... }?
 
 // Element methods
 
 function elementGet(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers);
+    var options = createOptions(this._url, queryParams, headers, this._headers);
 
     return requestWithMethod('GET')(options);
 }
 
 function elementGetList(element, queryParams, headers) {
     var url = this._url + '/' + element;
-    var options = createOptions(url, queryParams, headers);
+    var options = createOptions(url, queryParams, headers, this._headers);
     options.isCollection = true;
 
     return requestWithMethod('GET')(options);
 }
 
 function elementPut(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers);
+    var options = createOptions(this._url, queryParams, headers, this._headers);
     options.data = this;
 
     return requestWithMethod('PUT')(options);
@@ -60,15 +64,14 @@ function elementPut(queryParams, headers) {
 
 function elementPost(element, data, queryParams, headers) {
     var url = this._url + '/' + element;
-    var options = createOptions(url, queryParams, headers);
+    var options = createOptions(url, queryParams, headers, this._headers);
     options.data = data;
 
     return requestWithMethod('POST')(options);
 }
 
-
 function elementRemove(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers);
+    var options = createOptions(this._url, queryParams, headers, this._headers);
 
     return requestWithMethod('DELETE')(options);
 }
@@ -80,18 +83,21 @@ function collectionGet(id) {
     if(!id) {
         throw new Error('Expected argument id for function.');
     }
-    return requestWithMethod('GET')({url: this._url + '/' + id});
+    var url = this._url + '/' + id
+    var options = createOptions(url, queryParams, headers, this._headers);
+
+    return requestWithMethod('GET')(options);
 }
 
 function collectionGetList(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers);
+    var options = createOptions(this._url, queryParams, headers, this._headers);
     options.isCollection = true;
 
     return requestWithMethod('GET')(options);
 }
 
 function collectionPost(data, queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers);
+    var options = createOptions(this._url, queryParams, headers, this._headers);
     options.data = data;
 
     return requestWithMethod('POST')(options);
@@ -126,6 +132,7 @@ function attachObjectMethods(RestaurangObject, url, isCollection) {
     RestaurangObject.one = function(route, id) { return one(this, route, id); };
     RestaurangObject.all = function(route) { return all(this, route); };
     RestaurangObject.setUrl = function(url) { return setUrl(this, url); };
+    RestaurangObject.setDefaultHeaders = function(headers) { return setDefaultHeaders(this, headers); };
 
     return RestaurangObject;
 }
@@ -185,6 +192,16 @@ function ajax(options) {
 
 // Performs an AJAX request and attached Restaurang methods
 function request(options) {
+    // Clone of the payload data
+    var optionsCopy = Object.create(options);
+
+    // Remove underscored variables if we have data to send
+    if (optionsCopy.data) {
+        delete optionsCopy.data._url;
+        delete optionsCopy.data._isCollection;
+        delete optionsCopy.data._headers;
+    }
+
     return new Promise(function(resolve, reject) {
         Restaurang.ajax(options).then(function(data) {
 
@@ -216,10 +233,18 @@ function objectToUri(obj) {
 }
 
 // Generates options object with url and header
-function createOptions(url, queryParams, headers) {
+function createOptions(url, queryParams, headers, defaultHeaders) {
+    var headersCopy = defaultHeaders ? Object.create(defaultHeaders) : {};
+
+    if(headers) {
+        Object.keys(headers).map(function(key) {
+            headersCopy[key] = headers[key];
+        });
+    }
+
     return {
         url: url + (queryParams ? '?' +  objectToUri(queryParams) : ''),
-        headers: headers
+        headers: headersCopy
     };
 }
 

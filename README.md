@@ -63,6 +63,7 @@ Each Restaurang object has the following object methods (including `Restaurang` 
 * one(route, id)
 * all(route)
 * setUrl(url)
+* setDefaultHeaders(headers)
 
 ### Element methods
 
@@ -84,8 +85,6 @@ If you need a custom AJAX function for checking/renewing tokens or just want to 
 
 ## TODO
 
-* Remove underscore variables before requests
-* Support for default options (headers etc.)
 * Add support for extending elements, nested elements and collections with methods
 * Add to npm and bower
 * Tests
