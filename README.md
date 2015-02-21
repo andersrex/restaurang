@@ -83,10 +83,11 @@ If you need a custom AJAX function for checking/renewing tokens or just want to 
 
 ## TODO
 
-* fromServer
+* Custom requests
 * Add to npm and bower
 * HEAD, TRACE, jsonp
-* Profit!
+* Tests
+
 
 ## License
 
