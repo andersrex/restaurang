@@ -1,6 +1,6 @@
 {
     "name": "restaurang",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "author": "Anders Rex",
     "description": "A library for easily consuming RESTful APIs in Javascript.",
     "license": "MIT",
@@ -10,22 +10,27 @@
         "url": "https://github.com/andersrex/restaurang"
     },
     "main": "src/restaurang.js",
+    "dependencies": {
+        "whatwg-fetch": "*"
+    },
     "devDependencies": {
         "browserify": "*",
         "jshint": "*",
         "jscs": "*",
         "uglify-js": "*",
         "live-server": "*",
-        "jasmine": "*"
+        "jasmine": "*",
+        "watch": "latest"
     },
     "engines": {
-        "node": ">=0.10.0"
+        "node": ">=0.12.0"
     },
     "scripts": {
         "lint": "jshint src/",
         "test": "jasmine",
         "browserify": "browserify src/restaurang.js --standalone Restaurang > dist/restaurang.js",
         "uglify": "uglifyjs dist/restaurang.js -o dist/restaurang.min.js",
-        "build": "npm run browserify && npm run uglify"
+        "build": "npm run browserify && npm run uglify",
+        "watch": "watch 'npm run build' src/"
     }
 }

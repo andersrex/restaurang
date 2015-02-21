@@ -1,6 +1,6 @@
 /**
  * Restaurang
- * @version v0.0.1 - 2015-01-12
+ * @version v0.1.0 - 2015-02-21
  * @link https://github.com/andersrex/restaurang
  * @author Anders Rex <anders.rex@iki.fi>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -8,11 +8,11 @@
 
 'use strict';
 
-
 // Object methods
 
 // Creates a Restaurang object for one REST element
 function one(parent, route, id) {
+    if (!route) { throw new Error('Expected argument route for function.'); }
     if (!id) { throw new Error('Expected argument id for function.'); }
 
     var url = parent._url + '/' + route + '/' + id;
@@ -22,6 +22,8 @@ function one(parent, route, id) {
 
 // Creates a Restaurang object for a REST collection
 function all(parent, route) {
+    if (!route) { throw new Error('Expected argument route for function.'); }
+
     var url = parent._url + '/' + route;
 
     return createRestaurangObject(url, true);
@@ -29,11 +31,13 @@ function all(parent, route) {
 
 function setUrl(current, url) {
     current._url = url;
+
     return current;
 }
 
 function setDefaultHeaders(current, headers) {
     current._headers = headers;
+
     return current;
 }
 
@@ -42,187 +46,187 @@ function setDefaultHeaders(current, headers) {
 // Element methods
 
 function elementGet(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers, this._headers);
+    var url = constructUrl(this._url, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('GET')(options);
+    options.method = 'GET';
+
+    return request(url, options);
 }
 
 function elementGetList(element, queryParams, headers) {
-    var url = this._url + '/' + element;
-    var options = createOptions(url, queryParams, headers, this._headers);
-    options.isCollection = true;
+    var url = constructUrl(this._url + '/' + element, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('GET')(options);
+    options.method = 'GET';
+
+    return request(url, options, true);
 }
 
 function elementPut(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers, this._headers);
-    options.data = this;
+    if(!this._fromServer) { throw new Error('Element must be from server.'); }
 
-    return requestWithMethod('PUT')(options);
+    var url = constructUrl(this._url, queryParams),
+        options = constructOptions(headers, this._headers);
+
+    options.body = JSON.stringify(withoutUnderscoreValues(this));
+    options.method = 'PUT';
+
+    return request(url, options);
 }
 
 function elementPost(element, data, queryParams, headers) {
-    var url = this._url + '/' + element;
-    var options = createOptions(url, queryParams, headers, this._headers);
-    options.data = data;
+    var url = constructUrl(this._url + '/' + element, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('POST')(options);
+    options.body = JSON.stringify(withoutUnderscoreValues(data));
+    options.method = 'POST';
+
+    return request(url, options);
 }
 
 function elementRemove(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers, this._headers);
+    var url = constructUrl(this._url, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('DELETE')(options);
+    options.method = 'DELETE';
+
+    return request(url, options);
 }
 
 
 // Collection methods
 
-function collectionGet(id) {
-    if(!id) {
-        throw new Error('Expected argument id for function.');
-    }
-    var url = this._url + '/' + id
-    var options = createOptions(url, queryParams, headers, this._headers);
+function collectionGet(id, queryParams, headers) {
+    if(!id) { throw new Error('Expected argument id for function.'); }
+    var url = constructUrl(this._url + '/' + id, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('GET')(options);
+    options.method = 'GET';
+
+    return request(url, options);
 }
 
 function collectionGetList(queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers, this._headers);
-    options.isCollection = true;
+    var url = constructUrl(this._url, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('GET')(options);
+    options.method = 'GET';
+
+    return request(url, options, true);
 }
 
 function collectionPost(data, queryParams, headers) {
-    var options = createOptions(this._url, queryParams, headers, this._headers);
-    options.data = data;
+    var url = constructUrl(this._url, queryParams),
+        options = constructOptions(headers, this._headers);
 
-    return requestWithMethod('POST')(options);
+    options.body = JSON.stringify(withoutUnderscoreValues(data));
+    options.method = 'POST';
+
+    return request(url, options);
 }
 
 
 // Attaching functions
 
-function attachElementMethods(RestaurangObject) {
-    RestaurangObject.get = elementGet;
-    RestaurangObject.getList = elementGetList;
-    RestaurangObject.put = elementPut;
-    RestaurangObject.post = elementPost;
-    RestaurangObject.remove = elementRemove;
+function attachElementMethods(obj) {
+    obj.get = elementGet;
+    obj.getList = elementGetList;
+    obj.put = elementPut;
+    obj.post = elementPost;
+    obj.remove = elementRemove;
 
-    return RestaurangObject;
+    return obj;
 }
 
-function attachCollectionMethods(RestaurangObject) {
-    RestaurangObject.get = collectionGet;
-    RestaurangObject.getList = collectionGetList;
-    RestaurangObject.post = collectionPost;
+function attachCollectionMethods(obj) {
+    obj.get = collectionGet;
+    obj.getList = collectionGetList;
+    obj.post = collectionPost;
 
-    return RestaurangObject;
+    return obj;
 }
 
-function attachObjectMethods(RestaurangObject, url, isCollection) {
+function attachObjectMethods(obj, url, isCollection) {
     url = url || '';
 
-    RestaurangObject._url = url;
-    RestaurangObject._isCollection = isCollection;
-    RestaurangObject.one = function(route, id) { return one(this, route, id); };
-    RestaurangObject.all = function(route) { return all(this, route); };
-    RestaurangObject.setUrl = function(url) { return setUrl(this, url); };
-    RestaurangObject.setDefaultHeaders = function(headers) { return setDefaultHeaders(this, headers); };
+    obj._url = url;
+    obj._isCollection = isCollection;
+    obj.one = function(route, id) { return one(this, route, id); };
+    obj.all = function(route) { return all(this, route); };
+    obj.setUrl = function(url) { return setUrl(this, url); };
+    obj.setDefaultHeaders = function(headers) { return setDefaultHeaders(this, headers); };
 
-    return RestaurangObject;
+    return obj;
 }
 
-function attachMethods(RestaurangObject, url, isCollection) {
-    RestaurangObject = attachObjectMethods(RestaurangObject, url, isCollection);
+function attachMethods(obj, url, isCollection, fromServer) {
+    obj = attachObjectMethods(obj, url, isCollection);
 
     if (isCollection) {
-        RestaurangObject = attachCollectionMethods(RestaurangObject);
+        obj = attachCollectionMethods(obj);
     } else {
-        RestaurangObject = attachElementMethods(RestaurangObject);
+        obj = attachElementMethods(obj);
     }
 
-    return RestaurangObject;
+    if (fromServer) {
+        obj._fromServer = true;
+    }
+
+    return obj;
 }
 
-// Performs an AJAX request
-function ajax(options) {
-    var request = new XMLHttpRequest();
-
-    options = options || {};
-    options.url = options.url || '/';
-    options.method = options.method || 'GET';
-    options.headers = options.headers || {};
-
-    request.open(options.method, options.url, true);
-
-    // Set request headers
-    for (var key in options.headers ) {
-        request.setRequestHeader(key, options.headers[key]);
+// Rejects fetch unless status code is 2xx.
+function status(response) {
+    if (response.status >= 200 && response.status < 300) {
+        return Promise.resolve(response);
+    } else {
+        return Promise.reject(new Error(response.statusText));
     }
+}
 
-    // TODO: ?
-    request.setRequestHeader('Content-Type', 'application/json');
+// Get json object from response
+function json(response) {
+    return response.json();
+}
 
-    // console.log(options.method + ': ' + options.url)
+// Removes underscore values form an object
+function withoutUnderscoreValues(a) {
+    var b = extend({}, a);
 
-    request.send(JSON.stringify(options.data));
+    delete b._url;
+    delete b._fromServer;
+    delete b._isCollection;
+    delete b._headers;
 
-    // Return promise
-    return new Promise(function(resolve, reject) {
-        request.onreadystatechange = function () {
-
-            if (request.readyState !== 4) { return; }
-
-            if (request.status === 200) {
-                // TODO: Add error handling
-                var data = JSON.parse(request.responseText);
-
-                resolve(data, request.statusText, request);
-            } else {
-                reject(request, request.status, request.statusText);
-            }
-        };
-    });
+    return b;
 }
 
 // Performs an AJAX request and attached Restaurang methods
-function request(options) {
-    // Clone of the payload data
-    var optionsCopy = Object.create(options);
-
-    // Remove underscored variables if we have data to send
-    if (optionsCopy.data) {
-        delete optionsCopy.data._url;
-        delete optionsCopy.data._isCollection;
-        delete optionsCopy.data._headers;
-    }
-
+function request(url, options, isCollection) {
     return new Promise(function(resolve, reject) {
-        Restaurang.ajax(options).then(function(data) {
+//        console.log("fetch", options);
+        Restaurang.fetch(url, options).then(status).then(json).then(function(data) {
 
-            if(options.isCollection && !Array.isArray(data)) {
+            if(isCollection && !Array.isArray(data)) {
                 throw new Error('Expecting a collection as response.');
             }
 
-            var restaurangObject = attachMethods(data, options.url, options.isCollection);
+            var restaurangObject = attachMethods(data, url, isCollection, true);
 
             resolve(restaurangObject);
-        }, reject);
+        }).catch(reject);
     });
 }
 
-// Closure for creating the ajax methods
-function requestWithMethod(method) {
-    return function(options) {
-        options = options || {};
-        options.method = method;
-        return request(options);
-    };
+// Extend an object with another
+function extend(a, b) {
+    if(b) {
+        Object.keys(b).map(function(key) {
+            a[key] = b[key];
+        });
+    }
+    return a;
 }
 
 // Convert a object to a uri string
@@ -232,19 +236,20 @@ function objectToUri(obj) {
     }).join('&');
 }
 
-// Generates options object with url and header
-function createOptions(url, queryParams, headers, defaultHeaders) {
-    var headersCopy = defaultHeaders ? Object.create(defaultHeaders) : {};
+// Generates url based on url and query params
+function constructUrl(url, queryParams) {
+    return url + (queryParams ? '?' +  objectToUri(queryParams) : '')
+}
 
-    if(headers) {
-        Object.keys(headers).map(function(key) {
-            headersCopy[key] = headers[key];
-        });
-    }
+// Generates options object
+function constructOptions(newHeaders, defaultHeaders) {
+    var headers = {};
+
+    extend(headers, newHeaders);
+    extend(headers, defaultHeaders);
 
     return {
-        url: url + (queryParams ? '?' +  objectToUri(queryParams) : ''),
-        headers: headersCopy
+        headers: headers
     };
 }
 
@@ -261,6 +266,6 @@ function createRestaurangObject(url, isCollection) {
 
 var Restaurang = createRestaurangObject('');
 
-Restaurang.ajax = ajax;
+Restaurang.fetch = fetch;
 
 module.exports = Restaurang;

@@ -8,7 +8,7 @@ Only supports JSON objects for now.
 
 ## Disclaimer
 
-This is still very much work in progress. Come back in a few days for something more usable.
+This is still very much work in progress.
 
 ## Install
 
@@ -16,7 +16,10 @@ This is still very much work in progress. Come back in a few days for something 
 
 ...and you're good to go.
 
-Restaurang.js has no external dependencies but uses ECMAScript 6 promises and some ECMAScript 5 features. This means IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill and <IE9 users will need [es5-shim](https://github.com/es-shims/es5-shim).
+Restaurang uses the standard Fetch specification for requests, so you'll probably want the [fetch](https://github.com/github/fetch) polyfill.
+
+IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill and <IE9 users will need [es5-shim](https://github.com/es-shims/es5-shim).
+
 
 ## Usage
 
@@ -25,32 +28,29 @@ Restaurang.js has no external dependencies but uses ECMAScript 6 promises and so
 // Let's start by setting the base url
 Restaurang.setUrl("/api/v1");
 
+// Let's start by setting the base url
+Restaurang.setUrl("http://jsonplaceholder.typicode.com");
+
 // Fetch one post
 Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
-  post.name = "Lorem ipsum...";
+    post.name = "Lorem ipsum...";
 
-  post.save(); // PUT /api/v1/posts/1
+    console.log(post.name);
 
-  // Let's fetch the comments for this post
-  post.all("comments").getList().then(function(comments) { // GET /api/v1/posts/1/comments, expects an array
+    post.put(); // PUT /api/v1/posts/1
 
-    console.log(comments[0].id); // 1
-
-    comments[0].body = "Great story!";
-
-    comments[0].put(); // PUT /api/v1/posts/1/comments/1
-  });
+    // Let's fetch the comments for this post
+    post.all("comments").getList().then(function(comments) { // GET /api/v1/posts/1/comments, expects an array
+        console.log(comments[0].id); // 1
+    });
 });
-
-// Fetch a comment without first fetching the post
-Restaurang.one("posts", "1").one("comments", "1").get(); // GET /api/v1/posts/1/comments/1
 
 // Create a new post
 Restaurang.all("posts").post({ // POST /api/v1/posts
-  name: "Foo",
-  body: "Bar"
+    name: "Foo",
+    body: "Bar"
 }).then(function(post) {
-  console.log(post.body); // Bar
+    console.log(post.name);
 });
 ````
 
@@ -60,36 +60,34 @@ Each Restaurang object has the following object methods (including `Restaurang` 
 
 ### Object methods
 
-* one(route, id)
-* all(route)
-* setUrl(url)
-* setDefaultHeaders(headers)
+* one(route, id) - returns object with path /route/id
+* all(route) - returns collection with path /route
+* setUrl(url) - set url
+* setDefaultHeaders(headers) - set default headers included in each request
 
 ### Element methods
 
-* get([queryParams, headers])
-* getList(element, [queryParams, headers])
-* put([queryParams, headers])
-* post(element, data, [queryParams, headers])
-* remove([queryParams, headers])
+* get([queryParams, headers]) - gets element
+* getList(element, [queryParams, headers]) gets collection
+* put([queryParams, headers]) -
+* post(element, data, [queryParams, headers]) -
+* remove([queryParams, headers]) -
 
 ### Collection methods
 
-* get(id)
+* get(id,[queryParams, headers] )
 * getList([queryParams, headers])
 * post(data, [queryParams, headers])
 
-### Restaurang.ajax
+### Restaurang.fetch
 
 If you need a custom AJAX function for checking/renewing tokens or just want to be fancy, you can replace `Restaurang.ajax` with a `jQuery.ajax` compatible method.
 
 ## TODO
 
-* Add support for extending elements, nested elements and collections with methods
+* fromServer
 * Add to npm and bower
-* Tests
 * HEAD, TRACE, jsonp
-* ...
 * Profit!
 
 ## License

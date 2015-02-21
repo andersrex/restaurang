@@ -11,6 +11,7 @@
 <h1>Example</h1>
 <p>Open up your browser network monitor and see what this file does.</p>
 
+<script src="fetch.js"></script>
 <script src="../dist/restaurang.js"></script>
 <script>
 
@@ -21,28 +22,22 @@
     Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
         post.name = "Lorem ipsum...";
 
+        console.log(post.name);
+
         post.put(); // PUT /api/v1/posts/1
 
         // Let's fetch the comments for this post
         post.all("comments").getList().then(function(comments) { // GET /api/v1/posts/1/comments, expects an array
-
             console.log(comments[0].id); // 1
-
-            comments[0].body = "Great story!";
-
-            comments[0].put(); // PUT /api/v1/posts/1/comments/1
         });
     });
-
-    // Fetch a comment without first fetching the post
-    Restaurang.one("posts", "1").one("comments", "1").get(); // GET /api/v1/posts/1/comments/1
 
 	// Create a new post
     Restaurang.all("posts").post({ // POST /api/v1/posts
         name: "Foo",
         body: "Bar"
     }).then(function(post) {
-        console.log(post.body); // Bar
+        console.log(post.name);
     });
 
 </script>

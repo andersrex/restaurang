@@ -1,3 +1,5 @@
+fetch = function() {};
+
 Restaurang = require('../src/restaurang.js');
 
 describe('Restaurang', function() {
@@ -37,10 +39,13 @@ describe('Restaurang', function() {
         });
 
         it('should set url with setUrl', function() {
-            var url = 'http://google.com';
+            var  url = 'http://google.com';
+
             Restaurang.setUrl(url);
 
             expect(Restaurang._url).toBe(url);
+
+            Restaurang.setUrl('');
         });
 
         it('should set default headers with setDefaultHeaders', function() {
@@ -54,16 +59,173 @@ describe('Restaurang', function() {
     });
 
     describe('Element methods', function() {
-        it('should be tested', function() {
-            expect(1).toBe(2)
+        beforeEach(function() {
+            spyOn(Restaurang, 'fetch').and.callThrough();
+        });
+
+        it('shoud get an element', function() {
+            var one = Restaurang.one('posts', 1);
+
+            one.get();
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1', {headers: {}, method: 'GET'});
+        });
+
+        it('should get an element with queryParams and headers', function() {
+            var one = Restaurang.one('posts', 1);
+
+            var queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            one.get(queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1?testParam=foo', {headers: headers, method: 'GET'});
+        })
+
+        it('should get a list', function() {
+            var one = Restaurang.one('posts', 1);
+
+            one.getList('comments');
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1/comments', {headers: {}, method: 'GET'});
+        });
+
+        it('should get a list with queryParams and headers', function() {
+            var one = Restaurang.one('posts', 1);
+
+            var queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            one.getList('comments', queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1/comments?testParam=foo', {headers: headers, method: 'GET'});
+        });
+
+        it('should put an element', function() {
+            var one = Restaurang.one('posts', 1);
+
+            one._fromServer = true;
+            one.id = 1;
+
+            one.put();
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1', {headers: {}, method: 'PUT', body: '{"id":1}'});
+        });
+
+        it('should put an element with queryParams and headers', function() {
+            var one = Restaurang.one('posts', 1),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            one._fromServer = true;
+            one.id = 1;
+
+            one.put(queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1?testParam=foo', {headers: headers, method: 'PUT', body: '{"id":1}'});
+        });
+
+        it('should post an element', function() {
+            var one = Restaurang.one('posts', 1);
+
+            one.post('comments', {id: 1});
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1/comments', {headers: {}, method: 'POST', body: '{"id":1}'});
+        });
+
+        it('should post an element with queryParams and headers', function() {
+            var one = Restaurang.one('posts', 1),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            one.post('comments', {id: 1}, queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1/comments?testParam=foo', {headers: headers, method: 'POST', body: '{"id":1}'});
+        });
+
+        it('should remove an element', function() {
+            var one = Restaurang.one('posts', 1);
+
+            one._fromServer = true;
+            one.id = 1;
+
+            one.remove();
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1', {headers: {}, method: 'DELETE'});
+        });
+
+        it('should remove an element with queryParams and headers', function() {
+            var one = Restaurang.one('posts', 1),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            one._fromServer = true;
+            one.id = 1;
+
+            one.remove(queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1?testParam=foo', {headers: headers, method: 'DELETE'});
         });
     });
 
     describe('Collection methods', function() {
-        it('should be tested', function() {
-            expect(1).toBe(2)
+        beforeEach(function() {
+            spyOn(Restaurang, 'fetch').and.callThrough();
+        });
+
+        it('should get an item from collection', function() {
+            var all = Restaurang.all('posts');
+
+            all.get(1);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1', {headers: {}, method: 'GET'});
+        });
+
+        it('should get an item from collection', function() {
+            var all = Restaurang.all('posts'),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            all.get(1, queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts/1?testParam=foo', {headers: headers, method: 'GET'});
+        });
+
+        it('should get a collection', function() {
+            var all = Restaurang.all('posts');
+
+            all.getList();
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts', {headers: {}, method: 'GET'});
+        });
+
+        it('should get a collection with queryParams and headers', function() {
+            var all = Restaurang.all('posts'),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            all.getList(queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts?testParam=foo', {headers: headers, method: 'GET'});
+        });
+
+        it('should post a new element', function() {
+            var all = Restaurang.all('posts');
+
+            all.post({id: 1});
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts', {headers: {}, method: 'POST', body: '{"id":1}'});
+        });
+
+        it('should post a new element with queryParams and headers', function() {
+            var all = Restaurang.all('posts'),
+                queryParams = {testParam: 'foo'},
+                headers = {testHeader: 'bar'};
+
+            all.post({id: 1}, queryParams, headers);
+
+            expect(Restaurang.fetch).toHaveBeenCalledWith('/posts?testParam=foo', {headers: headers, method: 'POST', body: '{"id":1}'});
         });
     });
-
 });
 
