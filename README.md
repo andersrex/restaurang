@@ -75,7 +75,7 @@ Each Restaurang object has the following object methods (including `Restaurang` 
 
 ### Restaurang.fetch
 
-If you need a custom AJAX function for checking/renewing tokens or just want to be fancy, you can replace `Restaurang.ajax` with a `jQuery.ajax` compatible method.
+If you need a custom fetch function for checking/renewing tokens or just want to be fancy, you can replace `Restaurang.fetch` with a Fetch specification compatible function.
 
 ## TODO
 
