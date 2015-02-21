@@ -1,6 +1,6 @@
 # Restaurang.js
 
-Restaurang.js makes it easy to consume RESTful APIs in Javascript.
+A stripped-down, Restangular-inspired REST library using the Fetch specification.
 
 This was created because I wanted something similar to the excellent [Restangular](https://github.com/mgonto/restangular) outside AngularJS.
 
@@ -13,8 +13,6 @@ This is still very much work in progress.
 ## Install
 
 `<script src="restaurang.js"></script>`
-
-...and you're good to go.
 
 Restaurang uses the standard Fetch specification for requests, so you'll probably want the [fetch](https://github.com/github/fetch) polyfill.
 
@@ -60,24 +58,24 @@ Each Restaurang object has the following object methods (including `Restaurang` 
 
 ### Object methods
 
-* one(route, id) - returns object with path /route/id
-* all(route) - returns collection with path /route
-* setUrl(url) - set url
+* one(route, id) - creates an object with the endpoint /route/id
+* all(route) - creates a collection with the endpoint /route
+* setUrl(url) - sets the base url
 * setDefaultHeaders(headers) - set default headers included in each request
 
 ### Element methods
 
-* get([queryParams, headers]) - gets element
-* getList(element, [queryParams, headers]) gets collection
-* put([queryParams, headers]) -
-* post(element, data, [queryParams, headers]) -
-* remove([queryParams, headers]) -
+* get([queryParams, headers]) - GET element
+* getList(element, [queryParams, headers]) - GET collection
+* put([queryParams, headers]) - performs PUT on an element
+* post(element, data, [queryParams, headers]) - performs POST to element with data payload
+* remove([queryParams, headers]) - performs DELETE on an element
 
 ### Collection methods
 
-* get(id,[queryParams, headers] )
-* getList([queryParams, headers])
-* post(data, [queryParams, headers])
+* get(id,[queryParams, headers]) - GET element with id from collection
+* getList([queryParams, headers]) - GET collection
+* post(data, [queryParams, headers]) - POST data to collection endpoint
 
 ### Restaurang.fetch
 
