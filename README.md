@@ -18,16 +18,12 @@ Restaurang uses the standard Fetch specification for requests, so you'll probabl
 
 IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill and <IE9 users will need [es5-shim](https://github.com/es-shims/es5-shim).
 
-
 ## Usage
 
 ````javascript
 
 // Let's start by setting the base url
 Restaurang.setUrl("/api/v1");
-
-// Let's start by setting the base url
-Restaurang.setUrl("http://jsonplaceholder.typicode.com");
 
 // Fetch one post
 Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
