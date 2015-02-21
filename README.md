@@ -16,7 +16,7 @@ This is still very much work in progress.
 
 Restaurang uses the standard Fetch specification for requests, so you'll probably want the [fetch](https://github.com/github/fetch) polyfill.
 
-IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill and <IE9 users will need [es5-shim](https://github.com/es-shims/es5-shim).
+IE users will need the [es6-promise](https://github.com/jakearchibald/es6-promise) polyfill.
 
 ## Usage
 
