@@ -39,6 +39,9 @@ Restaurang.one("posts", "1").get().then(function(post) { // GET /api/v1/posts/1
     });
 });
 
+// Fetch a comment without first fetching the post
+Restaurang.one("posts", "1").one("comments", "1").get(); // GET /api/v1/posts/1/comments/1
+
 // Create a new post
 Restaurang.all("posts").post({ // POST /api/v1/posts
     name: "Foo",
